@@ -1,7 +1,5 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-import matplotlib
-import datetime
 
 if __name__ == '__main__':
     data_dir = 'data/'
