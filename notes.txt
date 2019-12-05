@@ -1,0 +1,39 @@
+
+recipe settings
+preprocessing 
+are some recipes prone to failure? 
+
+
+Todo: 
+        figure out how to split up the data? 
+                for all data
+                by recipe:
+
+notes: 
+        we should use F-score
+                Due to the fact that we have more good than bad
+
+algorithms that work:
+        perceptrons
+        svm - Austin
+        NB
+        DT/RF - 
+        NN - Me
+        
+
+preprocessing:
+        std for DT and RF (AUSTIN)
+        remove features that are not important
+
+
+Let's try doing leave one out
+
+go recipe by recipe
+
+Formulate test set:
+        we're going 25/75 split 
+        
+
+Let's see if it can predict for the other recipes?
+
+
