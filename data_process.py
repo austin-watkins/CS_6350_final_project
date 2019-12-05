@@ -106,7 +106,7 @@ def split_data_into_recipe_train_split():
         test.to_csv(recipe_folder_test + f'test_data_{i + 1}.csv')
 
 
-def discritise_std(data):
+def discretize_std(data):
     std = data.std()
     avg = data - data.mean()
     avg = avg.abs()
