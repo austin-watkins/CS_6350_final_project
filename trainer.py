@@ -16,7 +16,7 @@ def get_data_numpy(file):
     X_train = train_data.drop('label', axis=1)
     X_train = X_train.to_numpy()
 
-    test_data = pd.read_csv(f'data/recipe/train/train_data_{file}.csv')
+    test_data = pd.read_csv(f'data/recipe/test/test_data_{file}.csv')
     y_test = test_data['label']
     y_test = y_test.to_numpy()
     X_test = test_data.drop('label', axis=1)
@@ -26,7 +26,8 @@ def get_data_numpy(file):
 
 
 if __name__ == '__main__':
-    for recipe in range(1, 5):
+    # for recipe in range(1, 5):
+    for recipe in range(3, 5):
         (X_train_data, y_train_data), (X_test_data, y_test_data) = get_data_numpy(file=recipe)
         loo = LeaveOneOut()
 
@@ -39,11 +40,6 @@ if __name__ == '__main__':
         classes = np.unique(y_train_data)
         class_weights = compute_class_weight('balanced', classes, y_train_data)
         class_weights = {c: w for (c, w) in zip(classes, class_weights)}
-
-        # this is for linearSVM
-        # this is for my svm
-
-        results = []
 
         # THIS IS WHERE I SELECT MODELS
         model_type = 'SGDClassifier'
@@ -61,7 +57,7 @@ if __name__ == '__main__':
         else:
             raise ValueError('model not found')
 
-
+        results = []
         for a in args:
             svc = model(**a)
             cv_results = cross_val_score(svc, X_train_data, y_train_data, cv=loo.split(X_train_data, y_train_data), n_jobs=-1)
@@ -69,7 +65,6 @@ if __name__ == '__main__':
             results.append((average_score, a))
             file.write(f'argument: \t\t{a}\n')
             file.write(f'average score: \t{average_score:.4}\n\n')
-            break
 
         file.write('FINISHED TRAINING\n')
         file.write('Arguments sorted by accuracy:\n')
@@ -85,10 +80,33 @@ if __name__ == '__main__':
         svc.fit(X_train_data, y_train_data)
         file.write('\n')
         file.write('Accuracy:\n')
-        file.write(f'training accuracy is {svc.score(X_train_data, y_train_data)}\n')
-        file.write(f'test accuracy is {svc.score(X_test_data, y_test_data)}\n')
+        file.write(f'training accuracy: {svc.score(X_train_data, y_train_data)}\n')
+        file.write(f'test accuracy: {svc.score(X_test_data, y_test_data)}\n')
 
         file.write('\n')
         file.write('F1:\n')
-        file.write(f'training F1 is {f1_score(y_train_data, svc.predict(X_train_data))}\n')
-        file.write(f'test F1 is {f1_score(y_test_data, svc.predict(y_test_data))}\n')
+        file.write(f'training F1: {f1_score(y_train_data, svc.predict(X_train_data))}\n')
+        file.write(f'test F1: {f1_score(y_test_data, svc.predict(X_test_data))}\n')
+
+        file.write('\n')
+        file.write('repairs found:\n')
+
+        y_train_data = pd.DataFrame(y_train_data, columns=['label'])
+        X_train_data = pd.DataFrame(X_train_data)
+        X_train_data = pd.concat((y_train_data, X_train_data), axis=1)
+        X_train_data = X_train_data[X_train_data['label'] == -1]
+        X_train_data = X_train_data.drop('label', axis=1)
+        y_train_data = y_train_data[y_train_data['label'] == -1]
+
+        y_test_data = pd.DataFrame(y_test_data, columns=['label'])
+        X_test_data = pd.DataFrame(X_test_data)
+        X_test_data = pd.concat((y_test_data, X_test_data), axis=1)
+        X_test_data = X_test_data[X_test_data['label'] == -1]
+        X_test_data = X_test_data.drop('label', axis=1)
+        y_test_data = y_test_data[y_test_data['label'] == -1]
+
+        file.write(f'number of repair in training {len(y_train_data)}\n')
+        file.write(f'number of repair in testing {len(y_test_data)}\n')
+        file.write(f'training repair accuracy: {svc.score(X_train_data, y_train_data)}\n')
+        file.write(f'testing repair accuracy: {svc.score(X_test_data, y_test_data)}\n')
+        file.close()
