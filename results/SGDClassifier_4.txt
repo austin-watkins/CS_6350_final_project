@@ -1,0 +1,16 @@
+MODEL: SGDClassifier
+argument: 		{'eta0': 0.0001, 'learning_rate': 'invscaling', 'alpha': 0.0001, 'class_weight': {-1: 129.625, 1: 0.5019361084220716}}
+average score: 	0.5
+
+FINISHED TRAINING
+Arguments sorted by accuracy:
+(0.4999987601153919, {'eta0': 0.0001, 'learning_rate': 'invscaling', 'alpha': 0.0001, 'class_weight': {-1: 129.625, 1: 0.5019361084220716}})
+
+best_args: 	{'eta0': 0.0001, 'learning_rate': 'invscaling', 'alpha': 0.0001, 'class_weight': {-1: 129.625, 1: 0.5019361084220716}}
+training with 	{'eta0': 0.0001, 'learning_rate': 'invscaling', 'alpha': 0.0001, 'class_weight': {-1: 129.625, 1: 0.5019361084220716}}
+
+Accuracy:
+training accuracy is 0.003857280617164899
+
+F1:
+training F1 is 0.0

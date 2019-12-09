@@ -4,6 +4,7 @@ from sklearn.model_selection import train_test_split
 
 
 def basic_visualizations():
+
     data_dir = 'data/'
     rpc_file = 'implanter_rtc.csv'
     apc_file = 'implanter_apc.csv'
@@ -72,7 +73,7 @@ def split_data_into_recipe_train_split():
     data = pd.read_csv(data_dir + labeled_data_file)
     # remove any columns that only have nans and
     features = get_feature_columns()
-    data = data[features + ['label']]
+    data = data[['label'] + features]
     data.dropna(axis=1, how='all', inplace=True)
     # Turn time columns into datetime.
     # There might be more data cleaning we want to do.
@@ -102,6 +103,12 @@ def split_data_into_recipe_train_split():
 
         recipe_folder_test = 'data/recipe/test/'
         recipe_folder_train = 'data/recipe/train/'
+
+        train.drop('origrecipename', axis=1, inplace=True)
+        train.drop('runstart', axis=1, inplace=True)
+        test.drop('origrecipename', axis=1, inplace=True)
+        test.drop('runstart', axis=1, inplace=True)
+
         train.to_csv(recipe_folder_train + f'train_data_{i + 1}.csv')
         test.to_csv(recipe_folder_test + f'test_data_{i + 1}.csv')
 
@@ -124,11 +131,8 @@ def process_training_data():
     for i in range(1, 5):
         file_name = f'train_data_{i}.csv'
         data = pd.read_csv(training_folder + file_name)
-        data.drop('origrecipename', axis=1, inplace=True)
         # fixme: not sure if this is the right thing to do. Need to check.
-        data.drop('CHAMBERPRESSURE_20', axis=1, inplace=True)
         # remove this stuff
-        data.drop('runstart', axis=1, inplace=True)
         data.drop('Unnamed: 0', axis=1, inplace=True)
         labels.append(data['label'])
         data.drop('label', axis=1, inplace=True)
@@ -137,14 +141,44 @@ def process_training_data():
     return training_data, labels
 
 
-if __name__ == '__main__':
+def create_all_data():
+    split_data_into_recipe_train_split()
     data_sets, labels = process_training_data()
-    data_sets = list(map(discritise_std, data_sets))
+    data_sets = list(map(discretize_std, data_sets))
     data_sets = [pd.concat((l, d), axis=1) for (l, d) in zip(labels, data_sets)]
 
     for i, data in enumerate(data_sets):
         recipe_folder_test = 'data/recipe/test/'
         recipe_folder_train = 'data/recipe/train/'
         data.to_csv(recipe_folder_train + f'train_data_{i + 1}_binned.csv')
+        data.to_csv(recipe_folder_test + f'test_data_{i + 1}_binned.csv')
+
+
+if __name__ == '__main__':
+    from sklearn import decomposition, model_selection, naive_bayes, metrics
+    from sklearn.svm import SVC
+
+    data = pd.read_csv('data/recipe/train/train_data_1.csv')
+    y = data['label']
+    X = data.drop('label', axis=1)
+    X.drop('origrecipename', axis=1, inplace=True)
+    X.drop('runstart', axis=1, inplace=True)
+
+    # nb = naive_bayes.GaussianNB()
+    # nb = SVC()
+
+    # pca = decomposition.LatentDirichletAllocation(2)
+    # thing = pca.fit_transform(X, y)
+    # thing = pd.concat((y, pd.DataFrame(thing)), axis=1)
+    #
+    # import matplotlib.pyplot as plt
+    # ax = thing.plot.scatter(x=0, y=1, c='label', colormap='viridis')
+    # plt.show()
+
+
+    # print()
+
+
+
 
 
